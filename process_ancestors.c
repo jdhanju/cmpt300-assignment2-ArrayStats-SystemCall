@@ -21,6 +21,11 @@ SYSCALL_DEFINE3(process_ancestors, /* syscall name for macro */
 		long *, num_filled) /* # elements written to array */
 {
 	// your code here…
+    if(size <= 0){
+        return -EINVAL;
+
+    }
+
 	long pid; /* Process ID */
 	char name[ANCESTOR_NAME_LEN]; /* Program name of process */
 	long state; /* Current process state */
@@ -33,10 +38,18 @@ SYSCALL_DEFINE3(process_ancestors, /* syscall name for macro */
 
 	struct task_struct *curr_task = current;
 	struct task_struct *startingPoint = current;
+	struct list_head *headOfChildList = &(curr_task->children);
+	struct list_head *childernLoop = &(curr_task->children);
+	struct list_head *headOfSibList = &(curr_task->sibling);
+	struct list_head *siblingsLoop = &(curr_task->sibling);
+	int check = 0;
 	pid = curr_task->pid;
 	state = curr_task->state;
 	nvcsw = curr_task->nvcsw;
-    nivcsw = curr_task->nivcsw;
+	nivcsw = curr_task->nivcsw;
+    uid = curr_task->cred->uid.val;
+	num_children = 0;
+	num_siblings = 0;
 
 	for (i = 0; i < size; i++) {
 		//copy pid
@@ -63,17 +76,63 @@ SYSCALL_DEFINE3(process_ancestors, /* syscall name for macro */
 		}
 
 		//copy the nivcsw of the process
-		if (copy_to_user(&info_array[i].nivcsw, &nivcsw, sizeof(long)) !=
+		if (copy_to_user(&info_array[i].nivcsw, &nivcsw,
+				 sizeof(long)) != 0) {
+			return -EFAULT;
+		}
+
+		//get user ID
+
+		//get number of childern
+		//maybe change it to children->next != headofchildlist i think im off by one
+		//childernLoop = childernLoop->next;
+		// if (childernLoop->next != headOfChildList) {
+		// 	num_children++;
+		// }
+		//childernLoop = childernLoop->next;
+
+		while (childernLoop->next != headOfChildList) {
+			num_children++;
+			childernLoop = childernLoop->next;
+		}
+
+		if (copy_to_user(&info_array[i].num_children, &num_children,
+				 sizeof(long)) != 0) {
+			return -EFAULT;
+		}
+
+		//reset check
+		check = 0;
+
+		//get the number of siblings
+		if (siblingsLoop->next != headOfSibList) {
+			num_siblings++;
+		}
+		siblingsLoop = siblingsLoop->next;
+
+		while (siblingsLoop != headOfSibList) {
+			num_siblings++;
+			siblingsLoop = siblingsLoop->next;
+		}
+
+		if (copy_to_user(&info_array[i].num_siblings, &num_siblings,
+				 sizeof(long)) != 0) {
+			return -EFAULT;
+		}
+
+		//copy uid
+		if (copy_to_user(&info_array[i].uid, &uid, sizeof(long)) !=
 		    0) {
 			return -EFAULT;
 		}
 
+		//need to fix this
 		if (pid == 0) {
 			i++;
 			if (copy_to_user(num_filled, &i, sizeof(int)) != 0) {
 				return -EFAULT;
 			}
-			printk("Number of cycles: %d\n", i);
+			//printk("Number of cycles: %d\n", i);
 			return 0;
 		}
 
@@ -81,7 +140,14 @@ SYSCALL_DEFINE3(process_ancestors, /* syscall name for macro */
 		pid = curr_task->pid;
 		state = curr_task->state;
 		nvcsw = curr_task->nvcsw;
-        nivcsw = curr_task->nivcsw;
+		nivcsw = curr_task->nivcsw;
+		num_children = 0;
+		headOfChildList = &(curr_task->children);
+		childernLoop = &(curr_task->children);
+		headOfSibList = &(curr_task->sibling);
+		siblingsLoop = &(curr_task->sibling);
+		num_siblings = 0;
+		check = 0;
 	}
 
 	// printk("pid is: %d\n", current->pid);
