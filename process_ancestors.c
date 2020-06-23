@@ -27,7 +27,7 @@ SYSCALL_DEFINE3(process_ancestors, /* syscall name for macro */
     }
 
 	long pid; /* Process ID */
-	char name[ANCESTOR_NAME_LEN]; /* Program name of process */
+	//char name[ANCESTOR_NAME_LEN]; /* Program name of process */
 	long state; /* Current process state */
 	long uid; /* User ID of process owner */
 	long nvcsw; /* # voluntary context switches */
@@ -37,7 +37,7 @@ SYSCALL_DEFINE3(process_ancestors, /* syscall name for macro */
 	int i = 0;
 
 	struct task_struct *curr_task = current;
-	struct task_struct *startingPoint = current;
+	//struct task_struct *startingPoint = current;
 	struct list_head *headOfChildList = &(curr_task->children);
 	struct list_head *childernLoop = &(curr_task->children);
 	struct list_head *headOfSibList = &(curr_task->sibling);
@@ -81,16 +81,8 @@ SYSCALL_DEFINE3(process_ancestors, /* syscall name for macro */
 			return -EFAULT;
 		}
 
-		//get user ID
 
-		//get number of childern
-		//maybe change it to children->next != headofchildlist i think im off by one
-		//childernLoop = childernLoop->next;
-		// if (childernLoop->next != headOfChildList) {
-		// 	num_children++;
-		// }
-		//childernLoop = childernLoop->next;
-
+		//finding the number of children
 		while (childernLoop->next != headOfChildList) {
 			num_children++;
 			childernLoop = childernLoop->next;
@@ -105,12 +97,12 @@ SYSCALL_DEFINE3(process_ancestors, /* syscall name for macro */
 		check = 0;
 
 		//get the number of siblings
-		if (siblingsLoop->next != headOfSibList) {
-			num_siblings++;
-		}
-		siblingsLoop = siblingsLoop->next;
+		// if (siblingsLoop->next != headOfSibList) {
+		// 	num_siblings++;
+		// }
+		// siblingsLoop = siblingsLoop->next;
 
-		while (siblingsLoop != headOfSibList) {
+		while (siblingsLoop->next != headOfSibList) {
 			num_siblings++;
 			siblingsLoop = siblingsLoop->next;
 		}
