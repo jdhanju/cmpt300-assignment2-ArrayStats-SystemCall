@@ -1,3 +1,5 @@
+//By: Jaiveer Dhanju
+//Purpose: testing my syscall
 #include <stdio.h>
 #include <unistd.h>
 #include <sys/syscall.h>
@@ -62,6 +64,10 @@ int main()
     CHECK(syscall(SYSCALL_PROCESS_ANCESTORS, &storage, (long)-1, &count) == -1);
     CHECK(syscall(SYSCALL_PROCESS_ANCESTORS, &storage, (long)-12345, &count) == -1);
     CHECK(syscall(SYSCALL_PROCESS_ANCESTORS, &storage, SIZE, NULL) == -1);
+    CHECK(syscall(SYSCALL_PROCESS_ANCESTORS, &storage, SIZE, &count + 10000) == -1);
+    CHECK(syscall(SYSCALL_PROCESS_ANCESTORS, NULL, SIZE, &count) == -1);
+    CHECK(syscall(SYSCALL_PROCESS_ANCESTORS, &storage, SIZE, NULL) == -1);
+    CHECK(syscall(SYSCALL_PROCESS_ANCESTORS, &storage + 10000, SIZE, &count) == -1);
     CHECK(syscall(SYSCALL_PROCESS_ANCESTORS, &storage, SIZE, &count + 10000) == -1);
 
 

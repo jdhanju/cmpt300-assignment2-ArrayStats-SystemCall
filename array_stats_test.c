@@ -31,7 +31,33 @@ int main()
         printf("The min is: %ld\n", stats.min);
         printf("The max is: %ld\n", stats.max);
         printf("The sum is: %ld\n", stats.sum);
+    } else{
+        printf("First test failed");
     }
+
+    printf("\n\n");
+
+    struct array_stats_s stats2;
+    const long SIZE2 = 5;
+    long array2[5] = {5,6,7,8,9};
+    //long x = 5;
+    //long* test = &x + 70000000;
+
+    int secondGoodTest = syscall(SYSCALL_ARRAY_STATS, &stats2, &array2, SIZE2);
+
+    printf("------Second Test with expected normal data---------\n");
+
+    printf("Result is %d\n", secondGoodTest);
+
+    if (secondGoodTest == 0)
+    {
+        printf("The min is: %ld\n", stats2.min);
+        printf("The max is: %ld\n", stats2.max);
+        printf("The sum is: %ld\n", stats2.sum);
+    } else{
+        printf("second test failed");
+    }
+
     printf("\n\n\n");
 
     printf("--------------Test with size < 0--------------\n");

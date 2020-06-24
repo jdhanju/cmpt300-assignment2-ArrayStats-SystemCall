@@ -2,7 +2,7 @@
 # by Brian Fraser
 
 # Edit this file to compile extra C files into their own programs.
-TARGET=array_stats_test
+TARGET=array_stats_test process_ancestors_test
 
 CC_C = gcc
 
